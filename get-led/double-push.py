@@ -15,8 +15,8 @@ def dec2bin(value):
     return [int(element) for element in bin(value) [2:].zfill(8)]
 sleep_time = 0.2
 while True:
-    up_pressed = GPIO.input(up_button) == GPIO.LOW
-    down_pressed = GPIO.input(down_button) == GPIO.LOW
+    up_pressed = GPIO.input(up_button) == GPIO.HIGH
+    down_pressed = GPIO.input(down_button) == GPIO.HIGH
     if up_pressed and down_pressed:
         num= 255
         print("Обе кнопки нажаты. Максимум:", num, dec2bin(num))
