@@ -1,0 +1,36 @@
+from matplotlib import pyplot as plt
+
+
+def plot_voltage_vs_time(time, voltage, max_voltage):
+    """График зависимости измеренного напряжения от времени."""
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(time, voltage)
+
+    plt.title("График зависимости напряжения на входе АЦП от времени")
+    plt.xlabel("Время, с")
+    plt.ylabel("Напряжение, В")
+
+    plt.xlim(min(time), max(time))
+    plt.ylim(0, max_voltage)
+
+    plt.grid(True)
+    plt.show()
+
+
+def plot_sampling_period_hist(time):
+    """Распределение количества измерений по их продолжительности."""
+    sampling_periods = [time[i + 1] - time[i] for i in range(len(time) - 1)]
+
+    plt.figure(figsize=(10, 6))
+
+    plt.hist(sampling_periods)
+
+    plt.title("Гистограмма периодов измерений")
+    plt.xlabel("Период измерения, с")
+    plt.ylabel("Количество измерений")
+
+    plt.xlim(0, 0.06)
+
+    plt.grid(True)
+    plt.show()
