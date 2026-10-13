@@ -2,7 +2,6 @@ from matplotlib import pyplot as plt
 
 
 def plot_voltage_vs_time(time, voltage, max_voltage):
-    """График зависимости измеренного напряжения от времени."""
     plt.figure(figsize=(10, 6))
 
     plt.plot(time, voltage)
@@ -19,7 +18,6 @@ def plot_voltage_vs_time(time, voltage, max_voltage):
 
 
 def plot_sampling_period_hist(time):
-    """Распределение количества измерений по их продолжительности."""
     sampling_periods = [time[i + 1] - time[i] for i in range(len(time) - 1)]
 
     plt.figure(figsize=(10, 6))
