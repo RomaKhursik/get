@@ -1,0 +1,6 @@
+{
+  "code-runner.executorMap": {
+    "cpp": "cd $workspaceRoot && g++ -std=c++17 -O2 \"$fullFileName\" -o /tmp/run_bin && /tmp/run_bin"
+  },
+  "code-runner.runInTerminal": true
+}
