@@ -11,44 +11,41 @@ while True:
     time.sleep(0.2)
  
         print("\nОстановлено пользователем.")
-import time
-from mcp3021_driver import MCP3021
 
-DYNAMIC_RANGE = 3.3   # измерьте мультиметром на контакте PWR и впишите точное значение
-DURATION = 10.0       # длительность измерения, с (примерно 5·RC)
-PERIOD = 0.05         # пауза между измерениями, с
-
-voltage_values = []
-time_values = []
-mcp = None
-
-try:
-    mcp = MCP3021(dynamic_range=DYNAMIC_RANGE)
-    start_time = time.time()
-    print(f"Запуск измерения на {DURATION} с...")
-
-    while (time.time() - start_time) < DURATION:
-        current_time = time.time() - start_time
-        voltage = mcp.get_voltage()
-
-        time_values.append(current_time)
-        voltage_values.append(voltage)
-        time.sleep(PERIOD)
-
-    print(f"Измерение завершено! Собрано {len(voltage_values)} точек.")
-
-except KeyboardInterrupt:
-    print("\nИзмерение прервано пользователем.")
-
-finally:
-    if mcp:
-        mcp.deinit()
-        print("Драйвер MCP3021 закрыт.")
-
-# Сохранение данных (выполняется и при досрочной остановке)
-if time_values:
-    with open('data.csv', 'w', encoding='utf-8') as f:
-        f.write('Время[с],Напряжение[В]\n')
-        for t, u in zip(time_values, voltage_values):
-            f.write(f'{t:.4f},{u:.4f}\n')
-    print("Данные сохранены в data.csv")
+import pandas as pd
+import matplotlib.pyplot as plt
+ 
+# 1. Загрузка данных (разделитель , или ; определяется автоматически)
+data = pd.read_csv('data.csv', sep=None, engine='python')
+print(data.head())  # посмотреть названия столбцов
+ 
+t = data.iloc[:, 0]   # первый столбец — время
+u = data.iloc[:, 1]   # второй столбец — напряжение на конденсаторе
+ 
+# 2. Постоянная времени τ
+u0, u_end = u.iloc[0], u.iloc[-1]
+if u_end > u0:   # заряд: 63 % от установившегося значения
+    u_tau = u0 + 0.632 * (u_end - u0)
+    i_tau = (u >= u_tau).idxmax()
+else:            # разряд: 37 % от начального значения
+    u_tau = u_end + 0.368 * (u0 - u_end)
+    i_tau = (u <= u_tau).idxmax()
+tau = t[i_tau]
+print(f'τ ≈ {tau:.4g} с')
+ 
+# 3. График
+plt.figure(figsize=(8, 5))
+plt.plot(t, u, label='Напряжение на конденсаторе')
+plt.axvline(tau, color='gray', linestyle='--')
+plt.axhline(u_tau, color='gray', linestyle='--')
+plt.plot(tau, u_tau, 'ro', label=f'τ ≈ {tau:.3g} с')
+ 
+plt.title('Зависимость напряжения на конденсаторе от времени')
+plt.xlabel('Время, с')
+plt.ylabel('Напряжение, В')
+plt.grid(True)
+plt.legend()
+ 
+# 4. Сохранение вместо plt.show()
+plt.savefig('rc-plot.png', dpi=300)
+ 
