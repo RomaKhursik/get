@@ -11,25 +11,30 @@ while True:
     time.sleep(0.2)
  
         print("\nОстановлено пользователем.")
-
-import pandas as pd
+import csv
 import matplotlib.pyplot as plt
  
-# 1. Загрузка данных (разделитель , или ; определяется автоматически)
-data = pd.read_csv('data.csv', sep=None, engine='python')
-print(data.head())  # посмотреть названия столбцов
+# 1. Загрузка данных из data.csv (без pandas)
+t, u = [], []
+with open('data.csv', encoding='utf-8') as f:
+    reader = csv.reader(f)
+    header = next(reader)            # строка с названиями столбцов
+    for row in reader:
+        if not row:
+            continue                 # пропускаем пустые строки
+        t.append(float(row[0]))
+        u.append(float(row[1]))
  
-t = data.iloc[:, 0]   # первый столбец — время
-u = data.iloc[:, 1]   # второй столбец — напряжение на конденсаторе
+print(f'Столбцы: {header}, точек: {len(t)}')
  
 # 2. Постоянная времени τ
-u0, u_end = u.iloc[0], u.iloc[-1]
+u0, u_end = u[0], u[-1]
 if u_end > u0:   # заряд: 63 % от установившегося значения
     u_tau = u0 + 0.632 * (u_end - u0)
-    i_tau = (u >= u_tau).idxmax()
+    i_tau = next(i for i, v in enumerate(u) if v >= u_tau)
 else:            # разряд: 37 % от начального значения
     u_tau = u_end + 0.368 * (u0 - u_end)
-    i_tau = (u <= u_tau).idxmax()
+    i_tau = next(i for i, v in enumerate(u) if v <= u_tau)
 tau = t[i_tau]
 print(f'τ ≈ {tau:.4g} с')
  
@@ -48,4 +53,5 @@ plt.legend()
  
 # 4. Сохранение вместо plt.show()
 plt.savefig('rc-plot.png', dpi=300)
+print('График сохранён в rc-plot.png')
  
