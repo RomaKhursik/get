@@ -11,10 +11,12 @@ while True:
     time.sleep(0.2)
  
         print("\nОстановлено пользователем.")
+rm -rf .git
 git init
 git remote add origin git@github.com:lokpetr/get.git
-git pull origin main --allow-unrelated-histories
+git fetch origin
+git reset origin/main
 git add .
-git commit -m "Добавил проект"
+git commit -m "Мои изменения"
 git branch -M main
 git push -u origin main
